@@ -5,7 +5,7 @@ export default function TerminalPortfolio() {
   const hostname = "drinor";
   const fileTree = {
     info: {
-      "about.txt": "Hi! I'm Drinor.",
+      "about.txt": "Hi! I'm Drinor Topalli, currently working as a System Engineer.",
       "skills.txt": "Languages: Python, Go\nFrameworks: React, Next.js, Node.js\nOther: Git, Linux, Docker",
       projects: {
         "portfolio.txt": "Terminal Portfolio — A fun terminal-like interface to explore my work.",
@@ -26,11 +26,10 @@ export default function TerminalPortfolio() {
   const [history, setHistory] = useState([]);
   const [historyIndex, setHistoryIndex] = useState(-1);
   const [showHelp, setShowHelp] = useState(false);
-  const [promptTop, setPromptTop] = useState(null); // start as null
+  const [promptTop, setPromptTop] = useState(null);
   const promptRef = useRef(null);
 
   useEffect(() => {
-    // Measure initial position of the prompt once
     if (promptRef.current && promptTop === null) {
       setPromptTop(promptRef.current.getBoundingClientRect().top + window.scrollY);
     }
@@ -82,10 +81,27 @@ export default function TerminalPortfolio() {
     }
   }
 
+  // ---------------------- ADDITION: send email ----------------------
+  async function sendEmail(to, from, message) {
+    try {
+      const res = await fetch("https://your-serverless-function.vercel.app/sendmail", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ to, from, message })
+      });
+      if (!res.ok) throw new Error("Failed to send email");
+      return true;
+    } catch (err) {
+      console.error(err);
+      return false;
+    }
+  }
+  // ------------------------------------------------------------------
+
   function handleCommand(cmd) {
     const parts = cmd.trim().split(" ");
     const base = parts[0];
-    const arg = parts[1];
+    const arg = parts.slice(1).join(" ");
     const currentDir = getCurrentDir();
 
     switch (base) {
@@ -133,9 +149,29 @@ export default function TerminalPortfolio() {
         setOutput((o) => [
           ...o,
           promptString(cmd),
-          `<span style="color: #00ff00">Available commands: ls, ls -a, cd, cat, pwd, clear, help</span>`,
+          `<span style="color: #00ff00">Available commands: ls, ls -a, cd, cat, pwd, clear, help, echo</span>`,
         ]);
         break;
+
+      // ---------------------- ADDITION: echo command ----------------------
+      case "echo": {
+        const echoMatch = arg.match(/^from:(\S+)\s+"(.+)"\s*>\s*(\S+)$/);
+        if (echoMatch) {
+          const [, from, message, to] = echoMatch;
+          sendEmail(to, from, message).then((ok) => {
+            setOutput((o) => [
+              ...o,
+              promptString(cmd),
+              `<span style="color: #00ff00">${ok ? "Email sent successfully!" : "Failed to send email."}</span>`
+            ]);
+          });
+        } else {
+          setOutput((o) => [...o, promptString(cmd), `<span style="color: #00ff00">Usage: echo from:YourName "Message" > recipient@example.com</span>`]);
+        }
+        break;
+      }
+      // ------------------------------------------------------------------
+
       default:
         if (cmd.trim())
           setOutput((o) => [...o, promptString(cmd), `<span style="color: #00ff00">${base}: command not found</span>`]);
@@ -195,7 +231,7 @@ export default function TerminalPortfolio() {
       const base = parts[0];
       const arg = parts[1] || "";
       if (parts.length === 1) {
-        const commands = ["ls", "ls -a", "cd", "cat", "pwd", "clear", "help"];
+        const commands = ["ls", "ls -a", "cd", "cat", "pwd", "clear", "help", "echo"];
         const matches = commands.filter((c) => c.startsWith(base));
         if (matches.length === 1) setInput(matches[0] + " ");
         else if (matches.length > 1) setOutput((o) => [...o, promptString(input), matches.join("  ")]);
@@ -208,7 +244,7 @@ export default function TerminalPortfolio() {
 
   return (
     <div className="min-h-screen relative" style={{ backgroundColor: "black", color: "#00ff00" }}>
-      {/* Help toggle "?" fixed top-right, stays in place */}
+      {/* Help toggle "?" fixed top-right */}
       {promptTop !== null && (
         <div
           onClick={() => setShowHelp(!showHelp)}
@@ -253,6 +289,7 @@ export default function TerminalPortfolio() {
             <li><b>cat &lt;file&gt;</b> — view file</li>
             <li><b>clear</b> — clear terminal</li>
             <li><b>help</b> — show commands</li>
+            <li><b>echo from:YourName "Message" > recipient@example.com</b> — send email</li>
             <li><b>[TAB]</b> — autocomplete</li>
             <li><b>↑↓</b> — history</li>
           </ul>
