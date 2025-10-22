@@ -82,12 +82,12 @@ export default function TerminalPortfolio() {
   }
 
   // ---------------------- ADDITION: send email ----------------------
-  async function sendEmail(to, from, message) {
+  async function sendEmail(name, message) {
     try {
-      const res = await fetch("https://your-serverless-function.vercel.app/sendmail", {
+      const res = await fetch("https://<your-render-service>.onrender.com/sendmail", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ to, from, message })
+        body: JSON.stringify({ name, message }) // match sendmail.go payload
       });
       if (!res.ok) throw new Error("Failed to send email");
       return true;
@@ -158,7 +158,7 @@ export default function TerminalPortfolio() {
         const echoMatch = arg.match(/^from:(\S+)\s+"(.+)"\s*>\s*(\S+)$/);
         if (echoMatch) {
           const [, from, message, to] = echoMatch;
-          sendEmail(to, from, message).then((ok) => {
+          sendEmail(from, message).then((ok) => {
             setOutput((o) => [
               ...o,
               promptString(cmd),
