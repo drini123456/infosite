@@ -84,7 +84,7 @@ export default function TerminalPortfolio() {
   // ---------------------- ADDITION: send email ----------------------
   async function sendEmail(name, message) {
     try {
-      const res = await fetch("https://<your-render-service>.onrender.com/sendmail", {
+      const res = await fetch("https://formspree.io/f/movkonwq", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ name, message }) // match sendmail.go payload
@@ -158,15 +158,29 @@ export default function TerminalPortfolio() {
         const echoMatch = arg.match(/^from:(\S+)\s+"(.+)"\s*>\s*(\S+)$/);
         if (echoMatch) {
           const [, from, message, to] = echoMatch;
-          sendEmail(from, message).then((ok) => {
+
+          // Only send if recipient matches your email
+          if (to === "drinor.topalli@gmail.com") {
+            sendEmail(from, message).then((ok) => {
+              setOutput((o) => [
+                ...o,
+                promptString(cmd),
+                `<span style="color: #00ff00">${ok ? "Email sent successfully!" : "Failed to send email."}</span>`
+              ]);
+            });
+          } else {
             setOutput((o) => [
               ...o,
               promptString(cmd),
-              `<span style="color: #00ff00">${ok ? "Email sent successfully!" : "Failed to send email."}</span>`
+              `<span style="color: #ff5555">Cannot send to ${to}. Only messages to drinor.topalli@gmail.com are allowed.</span>`
             ]);
-          });
+          }
         } else {
-          setOutput((o) => [...o, promptString(cmd), `<span style="color: #00ff00">Usage: echo from:YourName "Message" > recipient@example.com</span>`]);
+          setOutput((o) => [
+            ...o,
+            promptString(cmd),
+            `<span style="color: #00ff00">Usage: echo from:YourName "Message" > your-email</span>`
+          ]);
         }
         break;
       }
@@ -289,7 +303,7 @@ export default function TerminalPortfolio() {
             <li><b>cat &lt;file&gt;</b> — view file</li>
             <li><b>clear</b> — clear terminal</li>
             <li><b>help</b> — show commands</li>
-            <li><b>echo from:YourName "Message" > recipient@example.com</b> — send email</li>
+            <li><b>echo from:YourName "Message" &gt; drinor.topalli@gmail.com</b> — send email</li>
             <li><b>[TAB]</b> — autocomplete</li>
             <li><b>↑↓</b> — history</li>
           </ul>
