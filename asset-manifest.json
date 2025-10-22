@@ -1,17 +1,17 @@
 {
   "files": {
-    "main.css": "/drini123456.github.io/infosite/static/css/main.d4e7b147.css",
-    "main.js": "/drini123456.github.io/infosite/static/js/main.b14585b7.js",
-    "static/js/453.19d6dbac.chunk.js": "/drini123456.github.io/infosite/static/js/453.19d6dbac.chunk.js",
-    "static/media/UbuntuMono-Regular.ttf": "/drini123456.github.io/infosite/static/media/UbuntuMono-Regular.9fa7d55c51063608f793.ttf",
-    "static/media/UbuntuMono-Bold.ttf": "/drini123456.github.io/infosite/static/media/UbuntuMono-Bold.ff97c0949f615c1b45af.ttf",
-    "index.html": "/drini123456.github.io/infosite/index.html",
-    "main.d4e7b147.css.map": "/drini123456.github.io/infosite/static/css/main.d4e7b147.css.map",
-    "main.b14585b7.js.map": "/drini123456.github.io/infosite/static/js/main.b14585b7.js.map",
-    "453.19d6dbac.chunk.js.map": "/drini123456.github.io/infosite/static/js/453.19d6dbac.chunk.js.map"
+    "main.css": "/infosite/static/css/main.72b3666a.css",
+    "main.js": "/infosite/static/js/main.73563e3f.js",
+    "static/js/453.19d6dbac.chunk.js": "/infosite/static/js/453.19d6dbac.chunk.js",
+    "static/media/UbuntuMono-Regular.ttf": "/infosite/static/media/UbuntuMono-Regular.9fa7d55c51063608f793.ttf",
+    "static/media/UbuntuMono-Bold.ttf": "/infosite/static/media/UbuntuMono-Bold.ff97c0949f615c1b45af.ttf",
+    "index.html": "/infosite/index.html",
+    "main.72b3666a.css.map": "/infosite/static/css/main.72b3666a.css.map",
+    "main.73563e3f.js.map": "/infosite/static/js/main.73563e3f.js.map",
+    "453.19d6dbac.chunk.js.map": "/infosite/static/js/453.19d6dbac.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.d4e7b147.css",
-    "static/js/main.b14585b7.js"
+    "static/css/main.72b3666a.css",
+    "static/js/main.73563e3f.js"
   ]
 }
