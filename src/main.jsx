@@ -81,20 +81,29 @@ export default function TerminalPortfolio() {
     }
   }
 
-  // ---------------------- ADDITION: send email ----------------------
-  async function sendEmail(name, message) {
+async function sendEmail(name, message) {
   try {
-    const res = await fetch("https://formspree.io/f/movkonwq", { // your Formspree form URL
+    const formData = new FormData();
+    formData.append("name", name);
+    formData.append("message", message);
+    formData.append("email", "no-reply@formspree.io"); // dummy email to satisfy validation
+
+    const res = await fetch("https://formspree.io/f/movkonwq", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        name: name,
-        message: message,
-        _replyto: name // optional, shows the sender in the email
-      })
+      body: formData,
+      headers: {
+        Accept: "application/json",
+      },
     });
-    if (!res.ok) throw new Error("Failed to send email");
-    return true;
+
+    const data = await res.json();
+
+    if (res.ok && (data.ok || data.next)) {
+      return true;
+    }
+
+    console.error("Formspree error:", data);
+    return false;
   } catch (err) {
     console.error(err);
     return false;
