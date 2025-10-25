@@ -4,19 +4,18 @@ import './index.css';
 export default function TerminalPortfolio() {
   const hostname = "drinor";
   const fileTree = {
+    ".secret.txt": "https://www.youtube.com/watch?v=D8m9SnrjpYY&list=RDD8m9SnrjpYY&start_radio=1",
     info: {
-      "about.txt": "Hi! I'm Drinor Topalli, currently working as a System Engineer.",
-      "skills.txt": "Languages: Python, Go\nFrameworks: React, Next.js, Node.js\nOther: Git, Linux, Docker",
+      "about.txt": "Hi! I'm Drinor Topalli, currently working as a System Engineer, with an interest in Cloud and DevOps.",
+      "skills.txt": "Systems:\n  - Linux\n  - WS Management\n  - Networking fundamentals\n  - Virtualization\n\nAutomation:\n  - Bash\n  - PowerShell\n  - Ansible\n\nCloud:\n  - Azure\n  - IAM & RBAC\n\nContainerization:\n  - Docker\n\nCurrently learning Kubernetes, Golang and other cool stuff",
       projects: {
         "portfolio.txt": "Terminal Portfolio — A fun terminal-like interface to explore my work.",
-        "blog.txt": "Personal blog — Sharing thoughts on tech.",
       },
       contact: {
         "email.txt": "drinor.topalli@gmail.com",
         "github.txt": "https://github.com/drini123456",
-        "linkedin.txt": "https://www.linkedin.com/in/drinortopalli/",
       },
-      ".secret.txt": "This is a hidden file! Only visible with 'ls -a'."
+  
     },
   };
 
@@ -28,12 +27,23 @@ export default function TerminalPortfolio() {
   const [showHelp, setShowHelp] = useState(false);
   const [promptTop, setPromptTop] = useState(null);
   const promptRef = useRef(null);
+  const inputRef = useRef(null);
+  const mirrorRef = useRef(null);
 
   useEffect(() => {
     if (promptRef.current && promptTop === null) {
       setPromptTop(promptRef.current.getBoundingClientRect().top + window.scrollY);
     }
   }, [promptTop]);
+
+  useEffect(() => {
+    if (!inputRef.current || !mirrorRef.current) return;
+    const mirror = mirrorRef.current;
+    // Ensure there is always at least 1ch width
+    mirror.textContent = (input && input.length > 0 ? input : " ") + " ";
+    const w = mirror.offsetWidth;
+    inputRef.current.style.width = (w || 1) + 'px';
+  }, [input]);
 
   function getCurrentDir() {
     return path.reduce((dir, p) => dir[p], fileTree);
@@ -119,12 +129,15 @@ async function sendEmail(name, message) {
     const currentDir = getCurrentDir();
 
     switch (base) {
-      case "ls":
-        setOutput((o) => [...o, promptString(cmd), formatLsOutput(currentDir)]);
+      case "ls": {
+        const showAll = arg === "-a" || arg === "--all";
+        setOutput((o) => [
+          ...o,
+          promptString(cmd),
+          formatLsOutput(currentDir, showAll),
+        ]);
         break;
-      case "ls -a":
-        setOutput((o) => [...o, promptString(cmd), formatLsOutput(currentDir, true)]);
-        break;
+      }
       case "cd": {
         if (!arg) {
           setPath([]);
@@ -317,9 +330,19 @@ async function sendEmail(name, message) {
             <li><b>cat &lt;file&gt;</b> — view file</li>
             <li><b>clear</b> — clear terminal</li>
             <li><b>help</b> — show commands</li>
-            <li><b>echo from:YourName "Message" &gt; drinor.topalli@gmail.com</b> — send email</li>
             <li><b>[TAB]</b> — autocomplete</li>
             <li><b>↑↓</b> — history</li>
+          </ul>
+
+          <h2 style={{ fontWeight: "bold", marginTop: "8px", marginBottom: "4px" }}>Info</h2>
+          <ul style={{ paddingLeft: "16px", margin: 0 }}>
+            <li>files are shown in <span style={{ color: '#00ff00' }}>green</span>.</li>
+            <li>folders are shown in <span style={{ color: '#3b82f6' }}>blue</span>.</li>
+          </ul>
+
+          <h3 style={{ fontWeight: "bold", marginTop: "8px", marginBottom: "4px" }}>Contact me</h3>
+          <ul style={{ paddingLeft: "16px", margin: 0 }}>
+            <li><b>echo from:NameOrEmail "Message" &gt; drinor.topalli@gmail.com</b> — send email</li>
           </ul>
         </div>
       )}
@@ -339,7 +362,7 @@ async function sendEmail(name, message) {
             }}
           />
         ))}
-        <form onSubmit={handleSubmit} className="flex items-center">
+        <form onSubmit={handleSubmit} className="flex items-center" style={{ overflowX: 'auto' }}>
           <span
             ref={promptRef}
             dangerouslySetInnerHTML={{ __html: `${hostname}@portfolio:${getPromptPath()}$ ` }}
@@ -347,10 +370,12 @@ async function sendEmail(name, message) {
               fontSize: "16px",
               fontFamily: "'Ubuntu Mono', monospace",
               color: "#00ff00",
+              whiteSpace: 'pre'
             }}
           />
           <input
-            className="flex-1"
+            ref={inputRef}
+            type="text"
             style={{
               backgroundColor: "black",
               border: "none",
@@ -362,11 +387,28 @@ async function sendEmail(name, message) {
               fontSize: "16px",
               margin: 0,
               padding: 0,
+              whiteSpace: 'pre',
+              flex: '0 0 auto',
+              width: '1ch'
             }}
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={handleKeyDown}
             autoFocus
+          />
+          {/* hidden mirror to measure text width */}
+          <span
+            ref={mirrorRef}
+            aria-hidden="true"
+            style={{
+              position: 'absolute',
+              visibility: 'hidden',
+              whiteSpace: 'pre',
+              fontSize: "16px",
+              fontFamily: "'Ubuntu Mono', monospace",
+              padding: 0,
+              margin: 0,
+            }}
           />
         </form>
       </div>
